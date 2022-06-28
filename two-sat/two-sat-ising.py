@@ -45,16 +45,16 @@ response = sampler.sample_ising(
   J,
   chain_strength=chain_strength,
   num_reads=n_runs,
-  label='2SAT Ising',
+  label='Demo',
 )
 
 print(response)
-print(response.first)
-print(response.info)
-print(response.record)
-print(response.variables)
-print(response.vartype)
+#print(response.first)
+#print(response.info)
+#print(response.record)
+#print(response.variables)
+#print(response.vartype)
 
-print(response.aggregate())
-print(response.lowest())
-print(response.done())
+#print(response.aggregate())
+#print(response.lowest())
+#print(response.done())
