@@ -6,8 +6,8 @@ import numpy as np
 # defines the 2SAT instance
 #v = np.array([
   #[1, -1, -1, 1],
-  #[-1, 0, -1, 0],
-  #[0, 1, 0, 1],
+  #[-1, 1, -1, 0],
+  #[0, 0, 0, 1],
 #])
 v = np.array([
   [1, -1, -1, 1, 1],
@@ -31,7 +31,8 @@ for (j, occs) in enumerate(v):
 n_vars = len(v)
 for i in range(n_vars):
   for j in range(n_vars):
-    J[(i, j)] = np.sum(v[i] * v[j])
+    if i < j:
+      J[(i, j)] = np.sum(v[i] * v[j])
 
 print(h)
 print(J)
