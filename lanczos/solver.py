@@ -11,8 +11,6 @@ def lanczos_iteration(M: np.ndarray, b: np.ndarray, n: int):
 
   for i in range(n):
 
-    print(f'Print iteration {(i+1)}.')
-
     # generates a new vector by applying M
     v = M.dot(Q[:, i])
 

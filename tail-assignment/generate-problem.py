@@ -4,8 +4,8 @@ import numpy as np
 #F = 468
 #R = 30
 F = 200
-R = 10
-n_routes = 5
+R = 15
+n_routes = 6
 n_flights_per_route = int(F/n_routes)
 
 flight_numbers = np.array(range(F))

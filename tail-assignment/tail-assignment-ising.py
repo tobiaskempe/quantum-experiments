@@ -6,7 +6,7 @@ import json
 
 import dwave.inspector
 
-A = np.load('problem_40_1.npy')
+A = np.load('problem_10_1.npy')
 #print(A)
 
 F = A.shape[1]

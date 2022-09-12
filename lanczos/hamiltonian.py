@@ -3,6 +3,8 @@ import numpy as np
 from scipy.sparse import coo_array, kron
 from collections import defaultdict
 from solver import lanczos_iteration
+import lanczos as lz
+import matplotlib.pyplot as plt
 
 A = np.load('problem_10_1.npy')
 F = A.shape[1]
@@ -51,25 +53,70 @@ for i, h_i in h.items():
     z_i = kron(z_i, pauli_0)
   all_z += h_i * z_i
 
-hamiltonian = 0.5 * all_x + 0.5 * all_z
+for x, J_ij in J.items():
+  i, j = x
+  zz_ij = pauli_z.copy()
+  for _ in range(0, i):
+    zz_ij = kron(pauli_0, zz_ij)
+  for _ in range(i+1, j):
+    zz_ij = kron(zz_ij, pauli_0)
+  zz_ij = kron(zz_ij, pauli_z)
+  for _ in range(j+1, n_qubits):
+    zz_ij = kron(zz_ij, pauli_0)
+  all_z += J_ij * zz_ij
 
-ones = np.ones((n_dims))
+steps = 10
+s_series = np.linspace(0, 1, steps)
+B_series = s_series.copy()
+A_series = 1 - B_series
 
-Q, T = lanczos_iteration(hamiltonian, ones, 50)
+iterations = 10
 
-#Tk = Q.T.dot(hamiltonian).dot(Q)
-Tk = (Q.T @ hamiltonian) @ Q
-print('Tk:', Tk)
+approximations = np.zeros((iterations + 1, steps))
+exacts = np.zeros((iterations + 1, steps))
+diffs = np.zeros((iterations + 1, steps))
 
-ut, vt = np.linalg.eigh(Tk)
-ut = np.sort(ut)
-print('approximation:', ut)
+for i in range(steps):
 
-#print(hamiltonian.toarray)
-u, v = np.linalg.eigh(hamiltonian.toarray())
-u = np.sort(u)
-print('exact:', u)
+  hamiltonian = A_series[i] * all_x + B_series[i] * all_z
 
-diffs = u[:len(ut)] - ut
-print('diffs:', diffs.T)
+  ones = np.random.uniform(low=0.5, high=1.0, size=(n_dims,))
+
+  Q, T = lanczos_iteration(hamiltonian, ones, iterations)
+
+  Tk = (Q.T @ hamiltonian) @ Q
+
+  ut, vt = np.linalg.eigh(Tk)
+  ut = np.sort(ut)
+  approximations[:, i] = ut
+  #print(len(ut))
+  #print('approximation:', ut)
+
+  #print(hamiltonian.toarray)
+  u, v = np.linalg.eigh(hamiltonian.toarray())
+  u = np.sort(u)
+  exacts[:, i] = u[:(iterations+1)]
+  #print('exact:', u)
+  if i==0:
+    print('approximation:', ut)
+    print('exact:', u)
+
+  #diffs = u[:len(ut)] - ut
+  #print('diffs:', diffs.T)
+  print(f'Simulated step {(i+1)}.')
+
+diffs = exacts - approximations
+gaps = approximations[1, :] - approximations[0, :]
+minimum_gap = np.min(gaps)
+print(f'Minimum energy gap: {minimum_gap}.')
+
+plt.figure()
+plt.xlabel('Time variable $s(t)$')
+plt.ylabel('Energy eigenstates of $H(t)$')
+plt.plot(s_series, approximations[0], color="blue", label="Ground state")
+plt.plot(s_series, approximations[1], color="green", label="1st excited state")
+plt.plot(s_series, exacts[0], linestyle='None', marker="x", color="blue")
+plt.plot(s_series, exacts[1], linestyle='None', marker="x", color="green")
+plt.legend()
+plt.show()
 
