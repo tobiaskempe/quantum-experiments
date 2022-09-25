@@ -2,6 +2,7 @@ from collections import defaultdict
 from dwave.system.samplers import DWaveSampler
 from dwave.system.composites import EmbeddingComposite
 import numpy as np
+import dimod
 
 # defines the 2SAT instance
 #v = np.array([
@@ -40,14 +41,15 @@ print(J)
 chain_strength = 2
 n_runs = 10
 
-sampler = EmbeddingComposite(DWaveSampler())
-response = sampler.sample_ising(
-  h,
-  J,
-  chain_strength=chain_strength,
-  num_reads=n_runs,
-  label='Demo',
-)
+#sampler = EmbeddingComposite(DWaveSampler())
+#response = sampler.sample_ising(
+  #h,
+  #J,
+  #chain_strength=chain_strength,
+  #num_reads=n_runs,
+  #label='Two SAT',
+#)
+response = dimod.ExactSolver().sample_ising(h, J)
 
 print(response)
 #print(response.first)
